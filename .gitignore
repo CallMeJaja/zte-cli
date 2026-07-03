@@ -1,0 +1,30 @@
+# Binaries
+zte-cli
+*.exe
+*.dll
+*.so
+*.dylib
+dist/
+build/
+
+# Config (user-specific, never commit)
+config.yaml
+
+# Go
+*.test
+*.out
+vendor/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

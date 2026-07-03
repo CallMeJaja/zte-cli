@@ -1,0 +1,25 @@
+# =========================================================
+# zte-cli Configuration
+# =========================================================
+# Copy this file to ~/.config/zte-cli/config.yaml
+# and edit the values below to match your setup.
+#
+# Config search priority:
+#   1. ./config.yaml          (current directory)
+#   2. ~/.config/zte-cli/     (user home, recommended)
+#   3. /etc/zte-cli/          (system-wide)
+
+# --- Router Settings ---
+router_host: "192.168.100.1"
+router_username: "admin"
+router_password: "admin"
+
+# --- Telegram Bot (Post-MVP, leave empty for now) ---
+# Get your bot token from @BotFather on Telegram
+# Get your chat ID from @userinfobot on Telegram
+telegram_token: ""
+telegram_whitelist_chat_id: 0
+
+# --- Monitoring ---
+# How often to check internet connectivity (seconds)
+check_interval_seconds: 30
