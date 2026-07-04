@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -133,12 +134,13 @@ func SetWiFiPassword(client *Client, password string) (bool, error) {
 		return false, fmt.Errorf("failed to encrypt password: %w", err)
 	}
 
-	formData := fmt.Sprintf(
-		"IF_ACTION=apply&IF_INDEX=0&KeyPassphrase=%s&_SESSION_TOKEN=%s",
-		encryptedPass, client.SessionToken,
-	)
+	formData := url.Values{}
+	formData.Set("IF_ACTION", "apply")
+	formData.Set("IF_INDEX", "0")
+	formData.Set("KeyPassphrase", encryptedPass)
+	formData.Set("_SESSION_TOKEN", client.SessionToken)
 
-	_, err = client.PostAction("net_wlanm_secrity1_t.gch", formData)
+	_, err = client.PostAction("net_wlanm_secrity1_t.gch", formData.Encode())
 	if err != nil {
 		return false, fmt.Errorf("failed to submit password change: %w", err)
 	}
@@ -157,12 +159,13 @@ func SetWiFiSSID(client *Client, ssid string) (bool, error) {
 		return false, fmt.Errorf("no session token available")
 	}
 
-	formData := fmt.Sprintf(
-		"IF_ACTION=apply&IF_INDEX=0&ESSID=%s&_SESSION_TOKEN=%s",
-		ssid, client.SessionToken,
-	)
+	formData := url.Values{}
+	formData.Set("IF_ACTION", "apply")
+	formData.Set("IF_INDEX", "0")
+	formData.Set("ESSID", ssid)
+	formData.Set("_SESSION_TOKEN", client.SessionToken)
 
-	_, err = client.PostAction("net_wlanm_essid1_t.gch", formData)
+	_, err = client.PostAction("net_wlanm_essid1_t.gch", formData.Encode())
 	if err != nil {
 		return false, fmt.Errorf("failed to submit SSID change: %w", err)
 	}

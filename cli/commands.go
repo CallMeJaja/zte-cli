@@ -15,7 +15,7 @@ func RunStatusCommand(client *router.Client) {
 		fmt.Fprintf(os.Stderr, "  [ERROR] Login failed: %v\n", err)
 		os.Exit(1)
 	}
-	handleStatus(client)
+	displayStatus(client)
 }
 
 // RunClientsCommand handles: zte-cli clients
@@ -25,7 +25,7 @@ func RunClientsCommand(client *router.Client) {
 		fmt.Fprintf(os.Stderr, "  [ERROR] Login failed: %v\n", err)
 		os.Exit(1)
 	}
-	handleClients(client)
+	displayClients(client)
 }
 
 // RunWiFiShowCommand handles: zte-cli wifi show
@@ -35,7 +35,7 @@ func RunWiFiShowCommand(client *router.Client) {
 		fmt.Fprintf(os.Stderr, "  [ERROR] Login failed: %v\n", err)
 		os.Exit(1)
 	}
-	showWiFiDetails(client)
+	displayWiFiDetails(client)
 }
 
 // RunWiFiSetCommand handles: zte-cli wifi set --ssid <name> --pass <password>
@@ -87,7 +87,7 @@ func RunWiFiQRCommand(client *router.Client) {
 		fmt.Fprintf(os.Stderr, "  [ERROR] Login failed: %v\n", err)
 		os.Exit(1)
 	}
-	showWiFiQR(client)
+	displayWiFiQR(client)
 }
 
 // RunRebootCommand handles: zte-cli reboot [--yes]

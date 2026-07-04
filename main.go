@@ -9,7 +9,7 @@ import (
 	"github.com/CallMeJaja/zte-cli/router"
 )
 
-const version = "0.1.0"
+var version = "dev"
 
 func main() {
 	args := os.Args[1:]
@@ -30,7 +30,7 @@ func main() {
 	}
 
 	// Load config
-	cfg, configPath, err := config.Load()
+	cfg, _, err := config.Load()
 	if err != nil {
 		// If config not found, offer to create one
 		fmt.Fprintf(os.Stderr, "\n  [ERROR] %s\n\n", err)
@@ -45,11 +45,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	_ = configPath // Used for debugging if needed
-
 	// Route to the appropriate handler
 	if len(args) == 0 {
 		// No arguments → interactive mode
+		cli.Version = version
 		cli.RunInteractive(client)
 		return
 	}
@@ -63,7 +62,7 @@ func main() {
 	case "wifi":
 		handleWiFi(client, args[1:])
 	case "reboot":
-		handleReboot(args[1:])
+		handleReboot(client, args[1:])
 	case "timeout":
 		handleTimeoutCmd(client, args[1:])
 	case "bot":
@@ -100,20 +99,13 @@ func handleWiFi(client *router.Client, args []string) {
 	}
 }
 
-func handleReboot(args []string) {
+func handleReboot(client *router.Client, args []string) {
 	confirm := false
 	for _, a := range args {
 		if a == "--yes" || a == "-y" {
 			confirm = true
 		}
 	}
-	// Need to load config again since client isn't passed here
-	cfg, _, err := config.Load()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "  [ERROR] %s\n", err)
-		os.Exit(1)
-	}
-	client, _ := router.NewClient(cfg.RouterHost, cfg.RouterUsername, cfg.RouterPassword)
 	cli.RunRebootCommand(client, confirm)
 }
 

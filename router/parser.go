@@ -18,6 +18,16 @@ var (
 	rePonRegStatus    = regexp.MustCompile(`RegStatus = "([^"]+)"`)
 	rePonSN           = regexp.MustCompile(`var sn = "([^"]+)";`)
 	reHTMLDecimal     = regexp.MustCompile(`&#([0-9]+);`)
+	reHexEscape       = regexp.MustCompile(`\\x([0-9a-fA-F]{2})`)
+
+	// LAN status parsing (compiled once at package init)
+	reLANTable = regexp.MustCompile(`(?s)<table[^>]*id="TestContent\d?"[^>]*>(.*?)</table>`)
+	reLANRow   = regexp.MustCompile(`(?s)<td\s+class="tdleft">(.*?)</td>\s*<td[^>]*>(.*?)</td>`)
+
+	// HTML tag stripping
+	reHTMLTags     = regexp.MustCompile(`<[^>]*>`)
+	reInputVal     = regexp.MustCompile(`(?i)value="?([^">\s]*)"?\s`)
+	reScriptValue  = regexp.MustCompile(`var\s+\w+\s*=\s*(\d+)`)
 )
 
 // DeviceInfo holds basic router identification.
@@ -300,10 +310,7 @@ func ParseLANStatus(html string) []LANPort {
 	// Each table has sequential rows: Ethernet Port, Status, Speed, Mode, Packets Rx/Bytes Rx, Packets Tx/Bytes Tx, Error Frames
 	// Row format: <td class="tdleft">LABEL</td> <td class="tdright">VALUE</td>
 
-	tablePattern := regexp.MustCompile(`(?s)<table[^>]*id="TestContent\d?"[^>]*>(.*?)</table>`)
-	rowPattern := regexp.MustCompile(`(?s)<td\s+class="tdleft">(.*?)</td>\s*<td[^>]*>(.*?)</td>`)
-
-	tables := tablePattern.FindAllStringSubmatch(html, -1)
+	tables := reLANTable.FindAllStringSubmatch(html, -1)
 
 	for _, table := range tables {
 		if len(table) < 2 {
@@ -311,7 +318,7 @@ func ParseLANStatus(html string) []LANPort {
 		}
 		tableContent := table[1]
 
-		rows := rowPattern.FindAllStringSubmatch(tableContent, -1)
+		rows := reLANRow.FindAllStringSubmatch(tableContent, -1)
 		port := LANPort{}
 		fieldIdx := 0
 
@@ -359,8 +366,6 @@ func ParseLANStatus(html string) []LANPort {
 }
 
 // extractInputValue extracts the value from an <input id="..." value="..."> element.
-var reInputValue = regexp.MustCompile(`(?s)id="([^"]*)"[^>]*value="?([^">\s]*)"?\s`)
-
 func extractInputValue(html string, id string) string {
 	pattern := regexp.MustCompile(fmt.Sprintf(`(?s)id="%s"[^>]*value="?([^">\s]*)"?\s`, id))
 	m := pattern.FindStringSubmatch(html)
@@ -382,8 +387,7 @@ func extractFieldValue(html string, label string) string {
 	if len(m) > 1 {
 		cellContent := m[1]
 		// Try to extract value from <input> element first
-		inputVal := regexp.MustCompile(`(?i)value="?([^">\s]*)"?\s`)
-		vm := inputVal.FindStringSubmatch(cellContent)
+		vm := reInputVal.FindStringSubmatch(cellContent)
 		if len(vm) > 1 {
 			raw := strings.TrimSpace(vm[1])
 			raw = decodeHTMLDecimalEntities(raw)
@@ -428,8 +432,6 @@ func extractTransferMeanings(html string) map[string]string {
 }
 
 // cleanHexEscapes converts \x2d to -, \x2e to ., etc.
-var reHexEscape = regexp.MustCompile(`\\x([0-9a-fA-F]{2})`)
-
 func cleanHexEscapes(s string) string {
 	return reHexEscape.ReplaceAllStringFunc(s, func(match string) string {
 		m := reHexEscape.FindStringSubmatch(match)
@@ -458,8 +460,7 @@ func decodeHTMLDecimalEntities(s string) string {
 
 // stripHTMLTags removes HTML tags from a string.
 func stripHTMLTags(s string) string {
-	re := regexp.MustCompile(`<[^>]*>`)
-	s = re.ReplaceAllString(s, "")
+	s = reHTMLTags.ReplaceAllString(s, "")
 	s = strings.ReplaceAll(s, "&nbsp;", " ")
 	s = strings.ReplaceAll(s, "&amp;", "&")
 	s = strings.ReplaceAll(s, "&lt;", "<")
@@ -475,8 +476,7 @@ func extractScriptValue(s string) string {
 		return s
 	}
 	// Try to extract the first numeric assignment
-	re := regexp.MustCompile(`var\s+\w+\s*=\s*(\d+)`)
-	m := re.FindStringSubmatch(s)
+	m := reScriptValue.FindStringSubmatch(s)
 	if len(m) > 1 {
 		return m[1]
 	}
