@@ -40,8 +40,8 @@ changelog:
 
 dockers:
   - image_templates:
-      - "ghcr.io/CallMeJaja/zte-cli:{{ .Version }}"
-      - "ghcr.io/CallMeJaja/zte-cli:latest"
+      - "ghcr.io/callmejaja/zte-cli:{{ .Version }}"
+      - "ghcr.io/callmejaja/zte-cli:latest"
     dockerfile: Dockerfile
     build_flag_templates:
       - "--pull"
