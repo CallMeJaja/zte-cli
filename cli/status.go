@@ -3,6 +3,7 @@ package cli
 import (
 	"bufio"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/CallMeJaja/zte-cli/router"
@@ -58,8 +59,7 @@ func RunStatusModule(client *router.Client, scanner *bufio.Scanner) {
 		}
 
 		// Parse choice
-		var id int
-		fmt.Sscanf(choice, "%d", &id)
+		id, _ := strconv.Atoi(choice)
 
 		if id == 0 {
 			continue

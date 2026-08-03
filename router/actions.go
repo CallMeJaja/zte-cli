@@ -3,6 +3,7 @@ package router
 import (
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -214,8 +215,10 @@ func FetchTimeout(client *Client) (int, error) {
 	if v, ok := data["Timeout"]; ok {
 		timeout := cleanHexEscapes(v)
 		// Parse integer
-		var val int
-		fmt.Sscanf(timeout, "%d", &val)
+		val, err := strconv.Atoi(timeout)
+		if err != nil {
+			return 0, fmt.Errorf("invalid timeout value: %s", timeout)
+		}
 		return val, nil
 	}
 

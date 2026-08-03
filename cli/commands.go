@@ -101,7 +101,7 @@ func RunRebootCommand(client *router.Client, confirm bool) {
 	if !confirm {
 		fmt.Print("  Are you sure you want to reboot the router? [y/N]: ")
 		var answer string
-		fmt.Scanln(&answer)
+		_, _ = fmt.Scanln(&answer)
 		if answer != "y" && answer != "yes" {
 			fmt.Println("  Reboot cancelled.")
 			return

@@ -298,7 +298,7 @@ func RunFirewallLevelCommand(client *router.Client, level string) {
 	}
 
 	// Capitalize first letter
-	level = strings.Title(strings.ToLower(level))
+	level = strings.ToUpper(level[:1]) + strings.ToLower(level[1:])
 	if level == "Mid" {
 		level = "Middle"
 	}
@@ -635,7 +635,7 @@ func RunResetCommand(client *router.Client, confirm bool) {
 	if !confirm {
 		fmt.Print("  ⚠️  WARNING: This will reset ALL settings to factory defaults! [y/N]: ")
 		var answer string
-		fmt.Scanln(&answer)
+		_, _ = fmt.Scanln(&answer)
 		if answer != "y" && answer != "yes" {
 			fmt.Println("  Factory reset cancelled.")
 			return
