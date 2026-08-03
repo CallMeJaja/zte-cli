@@ -3,6 +3,7 @@ package router
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -122,15 +123,13 @@ func parsePONStatusPage(html string) []string {
 
 	// Rx Power
 	if m := rePonRxPower.FindStringSubmatch(html); len(m) > 1 {
-		var val float64
-		fmt.Sscanf(m[1], "%f", &val)
+		val, _ := strconv.ParseFloat(m[1], 64)
 		lines = append(lines, fmt.Sprintf("Rx Power||%.2f dBm", val/10000))
 	}
 
 	// Tx Power
 	if m := rePonTxPower.FindStringSubmatch(html); len(m) > 1 {
-		var val float64
-		fmt.Sscanf(m[1], "%f", &val)
+		val, _ := strconv.ParseFloat(m[1], 64)
 		lines = append(lines, fmt.Sprintf("Tx Power||%.2f dBm", val/10000))
 	}
 
